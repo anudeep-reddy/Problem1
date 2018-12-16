@@ -25,9 +25,9 @@ shinyUI(fluidPage(
                     selected = 1),
        fileInput("udpipe_file", label = "Upload trained udpipe model of the selected language:"),
        checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags (XPOS):", 
-                          choices = list("adjective (JJ)" = 1, "noun (NN)" = 2, "proper noun (NNP)" = 3,
-                                         "adverb (RB)" = 4, "verb (VB)" = 5),
-                          selected = list(1,2,3))
+                          choices = list("adjective (JJ)" = 'ADJ', "noun (NN)" = 'NOUN', "proper noun (NNP)" = 'PRON',
+                                         "adverb (RB)" = 'ADV', "verb (VB)" = 'VERB'),
+                          selected = list('ADJ','NOUN','PRON'))
        
     ),   # end of sidebar panel
     
@@ -37,8 +37,7 @@ shinyUI(fluidPage(
                   
                   tabPanel("Overview",
                            h4('How to use this App?'),
-                           p('To use this app, first click on', 
-                             span(strong("Upload text file:")),
+                           p('To use this app, first click on', span(strong("Upload text file:")),
                              'and upload the input text file.'),
                            p('Now specify the language of the text file uploaded, by using the list provided under', 
                              span(strong("Select the language of the text uploaded:"))),
@@ -46,7 +45,8 @@ shinyUI(fluidPage(
                              span(strong("Upload trained udpipe model of the selected language:"))),
                            p('You can also select the part-of-speech tags from the given list of checkboxes')),
 
-                  tabPanel("Wordcloud",uiOutput("wordcloud")),
+                  tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
+                  tabPanel("test",verbatimTextOutput("pos_vector")),
                   tabPanel("Co-occurrence",uiOutput("coocrplots"))
                   
       ) # end of tabsetPanel

@@ -9,6 +9,8 @@
 
 library(shiny)
 
+options(shiny.maxRequestSize=30*1024^2)
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
@@ -16,18 +18,18 @@ shinyServer(function(input, output) {
     if (is.null(input$text_file)) {return(NULL)}
     else {
       doc = readLines(input$text_file$datapath)
-      doc  =  str_replace_all(doc, "\s\s+", "") #extra spaces condensed into 1
-      doc  =  str_replace_all(doc,"[^\sa-zA-Z0-9.-]","")  #remove special characters
+      #require(stringr)
+      #doc  =  str_replace_all(doc,"\s\s+", "") #extra spaces condensed into 1
+      #doc  =  str_replace_all(doc,"^\sa-zA-Z0-9.-","")  #remove special characters
       return(doc)}
-  })
+    })
   
-  pos_vector<-reactive({
+  output$pos_vector<-reactive({
     
     pos.vector <- as.vector(input$pos_tags)
     return(pos.vector)
     
-    
-  })
+    })
   
     
    annote_txt<-reactive({
@@ -41,7 +43,7 @@ shinyServer(function(input, output) {
      x<-as.data.frame(x)
       return(x)
      
-   })
+    })
   
   doc_cooc<-reactive({
     cooc_txt <- cooccurrence(   
@@ -50,8 +52,21 @@ shinyServer(function(input, output) {
       group = c("doc_id", "paragraph_id", "sentence_id"))
     
     
-  })
+    })
   
+  output$coocrplots <- renderUI({
+    if (is.null(input$file)) {return(NULL)}
+    else {
+      
+      plot_output_list <- lapply(1:input$seg, function(i) {
+        plotname <- paste("plot1", i, sep="")
+        plotOutput(plotname, height = 700, width = 700)
+      })
+      # Convert the list to a tagList - this is necessary for the list of items
+      # to display properly.
+      do.call(tagList, plot_output_list)
+    }
+    })
    
   })
 
