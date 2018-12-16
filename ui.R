@@ -20,7 +20,10 @@ shinyUI(fluidPage(
     sidebarPanel(
        
        fileInput("text_file", label = "Upload text file:"),
-       fileInput("udpipe_file", label = "Upload trained udpipe model:"),
+       radioButtons("lang", label = "Select the language of the text uploaded:",
+                    choices = list("English" = 1, "Hindi" = 2, "Spanish" = 3), 
+                    selected = 1),
+       fileInput("udpipe_file", label = "Upload trained udpipe model of the selected language:"),
        checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags (XPOS):", 
                           choices = list("adjective (JJ)" = 1, "noun (NN)" = 2, "proper noun (NNP)" = 3,
                                          "adverb (RB)" = 4, "verb (VB)" = 5),
@@ -37,15 +40,14 @@ shinyUI(fluidPage(
                            p('To use this app, first click on', 
                              span(strong("Upload text file:")),
                              'and upload the input text file.'),
-                           p('Then you may need to upload the trained udpipe model of any required language by clicking on',
-                             span(strong("Upload trained udpipe model:"))),
+                           p('Now specify the language of the text file uploaded, by using the list provided under', 
+                             span(strong("Select the language of the text uploaded:"))),
+                           p('Then you need to upload the trained udpipe model of the specified language by clicking on',
+                             span(strong("Upload trained udpipe model of the selected language:"))),
                            p('You can also select the part-of-speech tags from the given list of checkboxes')),
 
-                  tabPanel("Cluster mean",
-                           tableOutput('clust_summary')),
-                  
-                  tabPanel("Data",
-                           dataTableOutput('clust_data'))
+                  tabPanel("Wordcloud",uiOutput("wordcloud")),
+                  tabPanel("Co-occurrence",uiOutput("coocrplots"))
                   
       ) # end of tabsetPanel
     )
