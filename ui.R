@@ -47,6 +47,8 @@ shinyUI(fluidPage(
 
                   tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
                   tabPanel("test",verbatimTextOutput("pos_vector")),
+                  tabPanel("test1",verbatimTextOutput("annote_txt")),
+                  tabPanel("test2",verbatimTextOutput("dataset")),
                   tabPanel("Co-occurrence",uiOutput("coocrplots"))
                   
       ) # end of tabsetPanel

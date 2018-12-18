@@ -32,12 +32,13 @@ shinyServer(function(input, output) {
     })
   
     
-   annote_txt<-reactive({
+   output$annote_txt<-reactive({
      
      model = udpipe_load_model(input$udpipe_file$datapath)  # Load the model uploaded
      
      # now annotate text dataset using ud_model above
      # system.time({   # ~ depends on corpus size
+     doc = readLines(input$text_file$datapath)
      x <- udpipe_annotate(model, x = doc) #%>% as.data.frame() %>% head()
      x <- as.data.frame(x)
      x<-as.data.frame(x)
