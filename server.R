@@ -7,8 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
-
 options(shiny.maxRequestSize=30*1024^2)
 
 # Define server logic required to draw a histogram
@@ -18,55 +16,103 @@ shinyServer(function(input, output) {
     if (is.null(input$text_file)) {return(NULL)}
     else {
       doc = readLines(input$text_file$datapath)
-      #require(stringr)
-      #doc  =  str_replace_all(doc,"\s\s+", "") #extra spaces condensed into 1
-      #doc  =  str_replace_all(doc,"^\sa-zA-Z0-9.-","")  #remove special characters
-      return(doc)}
+      #temp <- tolower(doc)   # Lowercase
+      #temp <- stringr::str_extract_all(doc, "<.*?>") # get rid of html junk 
+      temp <- stringr::str_replace_all(doc,"[?.!,():;'-<>|\\s]+", " ") # anything not alphabetical followed by a space, replace!   
+      #temp <- stringr::str_replace_all(temp,"[^a-zA-Z\\s]", " ") # anything not alphabetical followed by a space, replace!   
+      temp <- stringr::str_replace_all(temp,"[\\s]+", " ") # collapse one or more spaces into one space.   
+      #temp <- as.character(temp)
+      return(temp)}
     })
   
-  output$pos_vector<-reactive({
+  lang_select<-reactive({
+    
+    language=input$lang
+    return(language)
+    
+  })
+  
+  
+  pos_vector<-reactive({
+    
+    names_vec = character()
     
     pos.vector <- as.vector(input$pos_tags)
-    return(pos.vector)
+   
+    if (lang_select()==1) {
+    for (i in 1:length(pos.vector)){
+      if(pos.vector[i]==1){names_vec[i]<-'JJ'}
+        else if (pos.vector[i]==2) {names_vec[i]<-'NN'}
+        else if (pos.vector[i]==3) {names_vec[i]<-'NNP'}
+        else if (pos.vector[i]==4) {names_vec[i]<-'RB'}
+        else if (pos.vector[i]==5) {names_vec[i]<-'VB'}
+      
+    }}
+    else
+    {
+      for (i in 1:length(pos.vector)){
+        if(pos.vector[i]==1){names_vec[i]<-'ADJ'}
+        else if (pos.vector[i]==2) {names_vec[i]<-'NOUN'}
+        else if (pos.vector[i]==3) {names_vec[i]<-'PROPN'}
+        else if (pos.vector[i]==4) {names_vec[i]<-'ADV'}
+        else if (pos.vector[i]==5) {names_vec[i]<-'VERB'}
+        
+      }}
+      
+      
+  
+    return(names_vec)
     
     })
   
-    
-   output$annote_txt<-reactive({
+
+  value <- renderPrint({ input$checkGroup })
+
+   annote_txt<-reactive({
      
      model = udpipe_load_model(input$udpipe_file$datapath)  # Load the model uploaded
      
      # now annotate text dataset using ud_model above
      # system.time({   # ~ depends on corpus size
-     doc = readLines(input$text_file$datapath)
-     x <- udpipe_annotate(model, x = doc) #%>% as.data.frame() %>% head()
+     x <- udpipe_annotate(model, x = dataset()) #%>% as.data.frame() %>% head()
      x <- as.data.frame(x)
-     x<-as.data.frame(x)
-      return(x)
+     
+     return(x)
      
     })
   
   doc_cooc<-reactive({
-    cooc_txt <- cooccurrence(   
-      x = subset(x, upos %in% pos.vector), 
+    if (lang_select()==1) {
+      
+    cooc_txt <- cooccurrence( 
+      x = subset(annote_txt(), xpos %in% pos_vector()), 
       term = "lemma", 
-      group = c("doc_id", "paragraph_id", "sentence_id"))
-    
+      group = c("doc_id", "paragraph_id", "sentence_id"))}
+    else{
+      cooc_txt <- cooccurrence( 
+        x = subset(annote_txt(), upos %in% pos_vector()), 
+        term = "lemma", 
+        group = c("doc_id", "paragraph_id", "sentence_id"))
+    }
+      
+    return(cooc_txt)
     
     })
-  
-  output$coocrplots <- renderUI({
-    if (is.null(input$file)) {return(NULL)}
-    else {
+  windowsFonts(devanew=windowsFont("Devanagari new normal"))
+  output$coocrplots <- renderPlot({
+    
+    wordnetwork <- head(doc_cooc(), 20)
+    wordnetwork <- igraph::graph_from_data_frame(wordnetwork) # needs edgelist in first 2 colms.
+    
+    ggraph(wordnetwork, layout = "fr") +  
       
-      plot_output_list <- lapply(1:input$seg, function(i) {
-        plotname <- paste("plot1", i, sep="")
-        plotOutput(plotname, height = 700, width = 700)
-      })
-      # Convert the list to a tagList - this is necessary for the list of items
-      # to display properly.
-      do.call(tagList, plot_output_list)
-    }
+      geom_edge_link(aes(width = cooc, edge_alpha = cooc), edge_colour = "green") +  
+      geom_node_text(aes(label = name), col = "red", size = 4) +
+      
+      theme_graph(base_family = "Arial Narrow") +  
+      theme(legend.position = "none") +
+      
+      labs(title = "Cooccurrences within 3 words distance", subtitle = pos_vector() )
     })
    
   })

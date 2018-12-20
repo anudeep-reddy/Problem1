@@ -13,7 +13,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Problem1: Shiny app for NLP"),
+  titlePanel("Problem1: Shiny app for UDPipe NLP Workflow"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -23,11 +23,17 @@ shinyUI(fluidPage(
        radioButtons("lang", label = "Select the language of the text uploaded:",
                     choices = list("English" = 1, "Hindi" = 2, "Spanish" = 3), 
                     selected = 1),
+       hr(),
+       fluidRow(column(3, verbatimTextOutput("value"))),
        fileInput("udpipe_file", label = "Upload trained udpipe model of the selected language:"),
-       checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags (XPOS):", 
-                          choices = list("adjective (JJ)" = 'ADJ', "noun (NN)" = 'NOUN', "proper noun (NNP)" = 'PRON',
-                                         "adverb (RB)" = 'ADV', "verb (VB)" = 'VERB'),
-                          selected = list('ADJ','NOUN','PRON'))
+       checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags :", 
+                          choices = list("adjective (JJ)" = 1, "noun (NN)" = 2, "proper noun (NNP)" = 3,
+                                         "adverb (RB)" = 4, "verb (VB)" = 5),
+                          selected = list(1,2,3))
+       # checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags :", 
+       #                    choices = list("adjective (JJ)" = 'JJ', "noun (NN)" = 'NN', "proper noun (NNP)" = 'NNP',
+       #                                   "adverb (RB)" = 'RB', "verb (VB)" = 'VB'),
+       #                    selected = list('JJ','NN','NNP'))
        
     ),   # end of sidebar panel
     
@@ -45,11 +51,10 @@ shinyUI(fluidPage(
                              span(strong("Upload trained udpipe model of the selected language:"))),
                            p('You can also select the part-of-speech tags from the given list of checkboxes')),
 
-                  tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
-                  tabPanel("test",verbatimTextOutput("pos_vector")),
-                  tabPanel("test1",verbatimTextOutput("annote_txt")),
-                  tabPanel("test2",verbatimTextOutput("dataset")),
-                  tabPanel("Co-occurrence",uiOutput("coocrplots"))
+                  #tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
+                  tabPanel("test",verbatimTextOutput("dataset")),
+                  
+                  tabPanel("Co-occurrence",plotOutput("coocrplots"))
                   
       ) # end of tabsetPanel
     )
