@@ -1,11 +1,6 @@
-#
 # This is the user-interface definition of a Shiny web application. You can
 # run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+
 
 library(shiny)
 
@@ -13,7 +8,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Problem1: Shiny app for UDPipe NLP Workflow"),
+  titlePanel("Problem1: Shiny app using UDPipe NLP Workflow"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -52,7 +47,7 @@ shinyUI(fluidPage(
                            p('You can also select the part-of-speech tags from the given list of checkboxes')),
 
                   #tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
-                  tabPanel("test",verbatimTextOutput("dataset")),
+                  tabPanel("data",verbatimTextOutput("dataset")),
                   
                   tabPanel("Co-occurrence",plotOutput("coocrplots"))
                   

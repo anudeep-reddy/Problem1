@@ -1,13 +1,4 @@
-#
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
-
-options(shiny.maxRequestSize=30*1024^2)
+options(shiny.maxRequestSize=30*1024^2) #max allowed file size is 30MB
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -16,12 +7,19 @@ shinyServer(function(input, output) {
     if (is.null(input$text_file)) {return(NULL)}
     else {
       doc = readLines(input$text_file$datapath)
-      #temp <- tolower(doc)   # Lowercase
-      #temp <- stringr::str_extract_all(doc, "<.*?>") # get rid of html junk 
-      temp <- stringr::str_replace_all(doc,"[?.!,():;'-<>|\\s]+", " ") # anything not alphabetical followed by a space, replace!   
-      #temp <- stringr::str_replace_all(temp,"[^a-zA-Z\\s]", " ") # anything not alphabetical followed by a space, replace!   
+      
+      if (lang_select()==2)
+      {
+      temp <- doc
+      }
+      else
+      {
+      temp <- sapply(doc, tolower)
+      temp <- stringr::str_replace_all(temp, "<.*?>", "") # get rid of html junk
+      temp <- stringr::str_replace_all(temp,"[?.!,():;'-<>|\\s]+", " ") # anything not alphabetical followed by a space, replace!   
       temp <- stringr::str_replace_all(temp,"[\\s]+", " ") # collapse one or more spaces into one space.   
-      #temp <- as.character(temp)
+      }
+      
       return(temp)}
     })
   
@@ -73,7 +71,6 @@ shinyServer(function(input, output) {
      model = udpipe_load_model(input$udpipe_file$datapath)  # Load the model uploaded
      
      # now annotate text dataset using ud_model above
-     # system.time({   # ~ depends on corpus size
      x <- udpipe_annotate(model, x = dataset()) #%>% as.data.frame() %>% head()
      x <- as.data.frame(x)
      
@@ -98,7 +95,7 @@ shinyServer(function(input, output) {
     return(cooc_txt)
     
     })
-  windowsFonts(devanew=windowsFont("Devanagari new normal"))
+  windowsFonts(devanew=windowsFont("Devanagari New Normal"))
   output$coocrplots <- renderPlot({
     
     wordnetwork <- head(doc_cooc(), 20)
