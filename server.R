@@ -1,4 +1,4 @@
-options(shiny.maxRequestSize=30*1024^2) #max allowed file size is 30MB
+options(shiny.maxRequestSize=40*1024^2) #max allowed file size is 40MB
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -109,19 +109,17 @@ shinyServer(function(input, output) {
       theme_graph(base_family = "Arial Narrow") +  
       theme(legend.position = "none") +
       
-      labs(title = "Cooccurrences within 3 words distance", subtitle = paste(pos_vector(),collapse=",") )
+      labs(title = "Co-occurrences within 3 words distance", subtitle = paste(pos_vector(),collapse=",") )
     })
    
   word_cloud1 <- reactive({
     if (lang_select()==1)
       {
         x = subset(annote_txt(), xpos %in% pos_vector())
-
       }
     else
       {
-        x = subset(annote_txt(), upos %in% pos_vector()) 
-        
+        x = subset(annote_txt(), upos %in% pos_vector())
       }
     top_words = txt_freq(x$lemma)
     return(top_words)
@@ -129,15 +127,36 @@ shinyServer(function(input, output) {
     })
   
   output$word_cloud <- renderPlot({
-    top_word <- head(word_cloud1(), 20)
+    top_word <- head(word_cloud1(), 30)
     #library(wordcloud)
     wordcloud(words = top_word$key, 
               freq = top_word$freq, 
               min.freq = 2, 
-              max.words = 100,
+              max.words = 30,
               random.order = FALSE, 
               colors = brewer.pal(6, "Dark2"))
     
   })
+  
+  output$downloadData1 <- downloadHandler(
+    filename = function() { "ISB_english_sample.txt" },
+    content = function(file) {
+      writeLines(readLines("data/ISB_english_sample.txt"), file)
+    }
+  )
+  
+  output$downloadData2 <- downloadHandler(
+    filename = function() { "ISB_hindi_sample.txt" },
+    content = function(file) {
+      writeLines(readLines("data/ISB_hindi_sample.txt"), file)
+    }
+  )
+  
+  output$downloadData3 <- downloadHandler(
+    filename = function() { "ISB_spanish_sample.txt" },
+    content = function(file) {
+      writeLines(readLines("data/ISB_spanish_sample.txt"), file)
+    }
+  )
   
 })

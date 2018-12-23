@@ -40,7 +40,15 @@ shinyUI(fluidPage(
                              span(strong("Select the language of the text uploaded:"))),
                            p('Then you need to upload the trained udpipe model of the specified language by clicking on',
                              span(strong("Upload trained udpipe model of the selected language:"))),
-                           p('You can also select the part-of-speech tags from the given list of checkboxes')),
+                           p('You can also select the part-of-speech tags from the given list of checkboxes'),
+                           br(),br(),
+                           h4(p("Download Sample text files here:")), 
+                           downloadButton('downloadData1', 'Download Sample English file'), 
+                           downloadButton('downloadData2', 'Download Sample Hindi file'), 
+                           downloadButton('downloadData3', 'Download Sample Spanish file'),
+                           br(),br(),
+                           p("Please note that download will not work with RStudio interface. Download will work only in web-browsers. So open this app in a web-browser and then download the example file. For opening this app in web-browser click on \"Open in Browser\" as shown below -"),
+                           img(src = "example1.png")),
 
                   tabPanel("Wordcloud",plotOutput("word_cloud",height = "400px", width = "100%")),
                   
