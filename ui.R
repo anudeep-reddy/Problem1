@@ -8,7 +8,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Problem1: Shiny app using UDPipe NLP Workflow"),
+  titlePanel("Shiny app using UDPipe NLP Workflow"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -25,11 +25,7 @@ shinyUI(fluidPage(
                           choices = list("adjective (JJ)" = 1, "noun (NN)" = 2, "proper noun (NNP)" = 3,
                                          "adverb (RB)" = 4, "verb (VB)" = 5),
                           selected = list(1,2,3))
-       # checkboxGroupInput("pos_tags", label = "Select list of part-of-speech tags :", 
-       #                    choices = list("adjective (JJ)" = 'JJ', "noun (NN)" = 'NN', "proper noun (NNP)" = 'NNP',
-       #                                   "adverb (RB)" = 'RB', "verb (VB)" = 'VB'),
-       #                    selected = list('JJ','NN','NNP'))
-       
+
     ),   # end of sidebar panel
     
     # Show a plot of the generated distribution
@@ -46,8 +42,7 @@ shinyUI(fluidPage(
                              span(strong("Upload trained udpipe model of the selected language:"))),
                            p('You can also select the part-of-speech tags from the given list of checkboxes')),
 
-                  #tabPanel("Wordcloud",plotOutput("wordcloud",height = 700, width = 700)),
-                  tabPanel("data",verbatimTextOutput("dataset")),
+                  tabPanel("Wordcloud",plotOutput("word_cloud",height = "400px", width = "100%")),
                   
                   tabPanel("Co-occurrence",plotOutput("coocrplots"))
                   

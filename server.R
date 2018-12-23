@@ -16,7 +16,7 @@ shinyServer(function(input, output) {
       {
       temp <- sapply(doc, tolower)
       temp <- stringr::str_replace_all(temp, "<.*?>", "") # get rid of html junk
-      temp <- stringr::str_replace_all(temp,"[?.!,():;'-<>|\\s]+", " ") # anything not alphabetical followed by a space, replace!   
+      temp <- stringr::str_replace_all(temp,"[?.!,():;'-<>\"|\\s]+", " ") # anything not alphabetical followed by a space, replace!   
       temp <- stringr::str_replace_all(temp,"[\\s]+", " ") # collapse one or more spaces into one space.   
       }
       
@@ -98,7 +98,7 @@ shinyServer(function(input, output) {
   windowsFonts(devanew=windowsFont("Devanagari New Normal"))
   output$coocrplots <- renderPlot({
     
-    wordnetwork <- head(doc_cooc(), 20)
+    wordnetwork <- head(doc_cooc(), 30)
     wordnetwork <- igraph::graph_from_data_frame(wordnetwork) # needs edgelist in first 2 colms.
     
     ggraph(wordnetwork, layout = "fr") +  
@@ -109,8 +109,35 @@ shinyServer(function(input, output) {
       theme_graph(base_family = "Arial Narrow") +  
       theme(legend.position = "none") +
       
-      labs(title = "Cooccurrences within 3 words distance", subtitle = pos_vector() )
+      labs(title = "Cooccurrences within 3 words distance", subtitle = paste(pos_vector(),collapse=",") )
     })
    
-  })
+  word_cloud1 <- reactive({
+    if (lang_select()==1)
+      {
+        x = subset(annote_txt(), xpos %in% pos_vector())
 
+      }
+    else
+      {
+        x = subset(annote_txt(), upos %in% pos_vector()) 
+        
+      }
+    top_words = txt_freq(x$lemma)
+    return(top_words)
+    
+    })
+  
+  output$word_cloud <- renderPlot({
+    top_word <- head(word_cloud1(), 20)
+    #library(wordcloud)
+    wordcloud(words = top_word$key, 
+              freq = top_word$freq, 
+              min.freq = 2, 
+              max.words = 100,
+              random.order = FALSE, 
+              colors = brewer.pal(6, "Dark2"))
+    
+  })
+  
+})
